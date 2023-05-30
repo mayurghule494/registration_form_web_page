@@ -1,15 +1,17 @@
-version : "3"
-services :
-  web :
+version: "3"
+services:
+  web:
     container_name: my-app
-    build : .
-    ports :
+    depends_on:
+      - db
+    build: .
+    ports:
       - "80:80"
       - "443:443"   # for future ssl traffic
     volumes:
-      - /var/opt/my_website:/usr/share/nginx/html
+      - web-data:/usr/share/nginx/html
                                      # OR # - ./volume/store_data/db.sqlite3:/data/db.sqlite3
-  db: 
+  db:
     container_name: my-db
     image: mysql:latest
     environment:
@@ -20,20 +22,20 @@ services :
     ports:
       - "3306:3306"
     volumes:
-      - /var/opt/my_db:/var/lib/mysql
+      - db-data:/var/lib/mysql
     #volumes:
      # - type: bind
       #- source: ./dbdata
-      #- target: /opt/app/dbdata      
-                                     # OR # - "./db:/docker-entrypoint-initdb.d" # this is how we persist a sql db even when container stops    
+      #- target: /opt/app/dbdata
+                                     # OR # - "./db:/docker-entrypoint-initdb.d" # this is how we persist a sql db even when container stops
   phpmyadmin:
     container_name: my-phpmyadmin
     image: phpmyadmin/phpmyadmin
     ports:
-      - "3307:3307"
+      - "8081:3307"
     environment:
       - PMA_HOST=db
       - PMA_PORT=3306
 volumes:
-  - /var/opt/my_website:
-  - /var/opt/my_db:
+  web-data:
+  db-data:
